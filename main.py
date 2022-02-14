@@ -4,6 +4,7 @@ frame and stacking style
 """
 import math
 import glob
+import configparser
 
 import numpy as np
 from PIL import Image, ImageFilter
@@ -12,13 +13,16 @@ from skimage.color import rgb2lab, lab2lch
 from cap_converter import create_circular_mask
 
 
-im = Image.open("shield.png")
-FRAME_WIDTH_INCHES = 45
-FRAME_HEIGHT_INCHES = 48
-FRAME_MARGIN_INCHES = 0
-CAP_BUFFER_MM = 3  # space between each cap
-ALIGNMENT = "staggered"
-PIXEL_ART = False
+config = configparser.ConfigParser()
+config.read("config.ini")
+
+IMAGE_NAME = config["DEFAULT"]["IMAGE_NAME"]
+FRAME_WIDTH_INCHES = float(config["DEFAULT"]["FRAME_WIDTH_INCHES"])
+FRAME_HEIGHT_INCHES = float(config["DEFAULT"]["FRAME_HEIGHT_INCHES"])
+FRAME_MARGIN_INCHES = float(config["DEFAULT"]["FRAME_MARGIN_INCHES"])
+CAP_BUFFER_MM = int(config["DEFAULT"]["CAP_BUFFER_MM"])
+ALIGNMENT = config["DEFAULT"]["ALIGNMENT"]
+PIXEL_ART = config["DEFAULT"].getboolean("PIXEL_ART")
 
 CAP_SIZE_MM = 30
 BUFFER_DIAMETER_MM = CAP_SIZE_MM + CAP_BUFFER_MM
@@ -33,6 +37,7 @@ HEIGHT_MM = FRAME_HEIGHT_INCHES * INCHES_TO_MM - 2 * FRAME_MARGIN_MM
 ASPECT_RATIO = WIDTH_MM / HEIGHT_MM
 
 # See how the image is going to fit in the frame area we gave it
+im = Image.open(IMAGE_NAME)
 im_w, im_h = im.size
 im_aspect_ratio = im_w / im_h
 img_width_mm = min(WIDTH_MM, im_aspect_ratio * HEIGHT_MM)
